@@ -7,13 +7,9 @@ String.prototype.format = function() {
     return formatted;
 };
 
-$('html').click(function() {
-   //Hide the menus if visible
-  $('.myDropDownItemContainer').slideUp("fast");
- });
+var blueDDLClass = (function(){
 
-
-generateDropdown = function(nome){
+	blueDDLClass.generateDropdown = function(nome){
 	return '<div id="' + nome + '" class="myDropDown">'
 	+ ''
 	+ '		<div class="myDropDownBox" >'
@@ -29,72 +25,74 @@ generateDropdown = function(nome){
 	+ '		</div>'
 	+ '	'
 	+ '</div>'
-}
+	}
 
-generatedList = function(nome, list){
-	var listTxt = '';
-	$(list).each(function(i,o){
-		listTxt = listTxt + '<div class="myDropDownItem" id="{0}" >{1}</div>'.format(nome,$(o).text());
-	});
-	return listTxt;
-}
+	blueDDLClass.generatedList = function(nome, list){
+		var listTxt = '';
+		$(list).each(function(i,o){
+			listTxt = listTxt + '<div class="myDropDownItem" id="{0}" >{1}</div>'.format(nome,$(o).text());
+		});
+		return listTxt;
+	}
 
-bindEventsDDL = function(){
-	return '<div id=\"scriptBlueDDL\"><script type=\"text/javascript\"> \
-        $(function(){  \
-          $(\'.myDropDown\').each(function(i,o){  \
-            $(\'.myDropDownBox\',o).unbind(\'click\').click(myDropDownControler);  \
-            $(\'.myDropDownItem\').unbind(\'click\').click(myDropDownItemControler);  \
-          });  \
-       })  \
-      </script></div>'; 
-}
+	blueDDLClass.bindEventsDDL = function(){
+	    return '<div id=\"scriptBlueDDL\"><script type=\"text/javascript\"> \
+            $(function(){  \
+               $(\'.myDropDown\').each(function(i,o){  \
+               $(\'.myDropDownBox\',o).unbind(\'click\').click(blueDDLClass.myDropDownControler);  \
+               $(\'.myDropDownItem\', o).click(blueDDLClass.myDropDownItemControler);  \
+             });  \
+           })  \
+           </script></div>'; 
+	};
 
-var blueDDL = (function(){
-	var clickDelegateEvent;
-	function blueDDL(clickDelegate){
-		clickDelegateEvent = clickDelegate;
-	)
-	blueDDL.prototype.myDropDownControler = function() {
+	blueDDLClass.myDropDownControler = function() {
 		$('.myDropDownItemContainer', $(this).closest('.myDropDown')).slideToggle("fast");
 		event.stopPropagation()
-	}
-	blueDDL.prototype.myDropDownItemControler = function() {
+	};
+	blueDDLClass.myDropDownItemControler = function() {
 	    $('.myDropDownBoxName', $(this).closest('.myDropDown')).text($(this).text());
 		$('.myDropDownItemContainer', $(this).closest('.myDropDown')).slideToggle("fast");
 		event.stopPropagation();
 
-		clickDelegateEvent();
 	    return false;
-	}
+	};
 
-
-	return blueDDL;
-})();
-
-$.extend($.fn, {
-    blueDDL: function(itemSelectedClick){
-    	var nome = $(this).attr('id');
-    	var textGenerated = generateDropdown(nome);
-   	    var listItem = $('.listItem', this);
+	function blueDDLClass(clickDelegate, obj){
+		var nome = $(obj).attr('id');
+    	var textGenerated = blueDDLClass.generateDropdown(nome);
+   	    var listItem = $('.listItem', obj);
    	    var appendText = '';
 
-   	    if(typeof(itemSelectedClick) != undefined)
-   	    	itemSelectedDelegate = itemSelectedClick;
-
    	    //ocultando itens da lista
-   	    $('.listItem', this).hide();
+   	    $('.listItem', obj).hide();
 
 		if(listItem.length <= 0)
 			appendText = textGenerated.format('');
 		else
-			appendText = textGenerated.format(generatedList(nome,listItem));
+			appendText = textGenerated.format(blueDDLClass.generatedList(nome,listItem));
 
-        $(this).append(
+        $(obj).append(
         	appendText
 		);
 
+		if(typeof(clickDelegate) != 'undefined')
+			$('.myDropDownItem', obj).on('click',clickDelegate);
+	}
+
+	return blueDDLClass;
+
+})();
+
+$('html').click(function() {
+  $('.myDropDownItemContainer').slideUp("fast");
+ });
+
+$.extend($.fn, {
+    blueDDL: function(itemSelectedClick){
+    	new blueDDLClass(itemSelectedClick, this);
+
 		if($('#scriptBlueDDL').length == 0)
-			$('body').append(bindEventsDDL);
+			$('body').append(blueDDLClass.bindEventsDDL);
     }
 });
