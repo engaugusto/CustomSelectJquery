@@ -1,3 +1,40 @@
+/*
+* blueDDL
+*
+* Autor : Carlos Augusto e Thiago Colen
+* Data : 16/03/2013
+* Descrição: Customização do elemento Select, com opção para select com checkbox.
+* Requisitos: Jquery, Jquery-UI
+*
+* Exemplo:
+*   A partir de uma div com uma lista de itens a ser exibido, é necessário gerar com a classe listItem
+*   <div id='divId'>
+*     <div class='listItem'>Item1</div>
+*     <div class='listItem'>Item2</div>
+*     <div class='listItem'>Item3</div>
+*   </div>
+*
+*   Executar no document ready
+*   $('#divId').blueDDL();
+*   
+*   Com 2 possíveis paraemtros, o click da função e a opção de tornar checkbox
+*   Exemplo 2 com callBack:
+*   function hello(){
+*	  alert('Hello');
+*	}
+*   Executar no document ready
+*   $('#divId').blueDDL(hello);
+*
+*	Exemplo 3 com callBack e checkbox:
+*   function hello(){
+*	  alert('Hello');
+*	}
+*   Executar no document ready
+*   $('#divId').blueDDL(hello, true);
+
+*
+* 
+*/
 String.prototype.format = function() {
     var formatted = this;
     for (var i = 0; i < arguments.length; i++) {
@@ -57,7 +94,7 @@ var blueDDLClass = (function(){
 	blueDDLClass.myDropDownItemControler = function() {
 	    $('.myDropDownBoxName', $(this).closest('.myDropDown')).text($(this).text());
 
-		
+		//inverte o estado
 		if(blueDDLClass.checkBox){
 			if($('.myDropDownCheckbox',this).hasClass('myDropDownChecked')){
 				$('.myDropDownCheckbox',this).removeClass('myDropDownChecked');
@@ -67,6 +104,7 @@ var blueDDLClass = (function(){
 				$('.myDropDownCheckbox',this).addClass('myDropDownChecked');
 			}
 		}else{
+			//se não for checkbox já fecha após a seleção
 			$('.myDropDownItemContainer', $(this).closest('.myDropDown')).slideToggle("fast");
 		}
 		event.stopPropagation();
