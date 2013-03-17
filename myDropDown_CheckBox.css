@@ -2,13 +2,13 @@
 /* CSS Document */
 
 
-.myDropDownChecked { float:left; width:15px; height:17px; background-image:url(imgs/dropdownButton.png);background-position:0px 0px cursor:pointer;}
-.myDropDownUnchecked { float:left; width:15px; height:17px; background-image:url(imgs/dropdownButton.png);background-position:0px 17px cursor:pointer; }
+.myDropDownChecked { float:left; width:15px; height:14px; background-image:url(imgs/blueDDLImages.png);background-position:0px 14px; cursor:pointer;}
+.myDropDownUnchecked { float:left; width:15px; height:14px; background-image:url(imgs/blueDDLImages.png);background-position:0px -1px; cursor:pointer; }
 .myDropDown { font-family:Arial, Helvetica, sans-serif; font-size:11px; }
 .myDropDownBox { position:relative; float:left; border:solid 1px #00359f; height:17px; width:150px; }
 
 .myDropDownBoxName { float:left; width:130px; height:17px; padding:2px 0px 0px 3px; overflow:hidden; white-space:nowrap; }
-.myDropDownBoxIco { float:left; width:17px; height:17px; background-image:url(imgs/dropdownButton.png); cursor:pointer; }
+.myDropDownBoxIco { float:left; width:17px; height:17px; background-image:url(imgs/blueDDLImages.png); background-position: 19px -1px; cursor:pointer; }
 
 .myDropDownItemContainer { position:absolute; z-index:1000; border:solid 1px #00359f; width:150px; }
 
