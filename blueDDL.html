@@ -1,0 +1,76 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>myDropDown with CheckBox</title>
+
+    <link href="blueDDL.css" rel="stylesheet" type="text/css" />
+
+    <script src="jquery-1.9.1.js"></script>
+        <script src="blueDDL.js"></script>
+    <script src="jquery-ui-1.10.1.custom.js"></script>
+	<script>
+        function a(){
+            console.log('oi oi oi !');
+        }
+		$(document).ready(function() {
+            $('#vaiquevai').blueDDL(a);
+            $('#vamoquevamo').blueDDL(a,true);
+		});
+    </script> 
+
+</head>
+<body style="font-family:Arial, Helvetica, sans-serif;">
+
+
+<table border="1" cellpadding="10" cellspacing="10">
+	<tr>
+    	<td></td>
+    	<td></td>
+    	<td></td>
+    </tr>
+	<tr>
+    	<td>
+              <div id="vaiquevai" style='width:90px'>
+                <div class="listItem">bla1</div>
+                <div class="listItem">bla2</div>
+                <div class="listItem">bla3</div>
+              </div>
+        </td>
+    	<td></td>
+    	<td></td>
+    </tr>
+	<tr>
+    	<td></td>
+    	<td></td>
+    	<td></td>
+    </tr>
+	<tr>
+    	<td>
+            <div id="vamoquevamo" style='width:150px'>
+                <div class="listItem">123</div>
+                <div class="listItem">456</div>
+                <div class="listItem">789</div>
+                <div class="listItem">123</div>
+                <div class="listItem">456</div>
+                <div class="listItem">789</div>
+                <div class="listItem">123</div>
+                <div class="listItem">456</div>
+                <div class="listItem">789</div>
+                <div class="listItem">123</div>
+                <div class="listItem">456</div>
+                <div class="listItem">789</div>
+              </div>
+        </td>
+    	<td></td>
+    	<td></td>
+    </tr>
+</table>
+
+
+<Br /><Br />
+
+
+
+</body>
+</html>
