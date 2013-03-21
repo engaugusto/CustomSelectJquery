@@ -6,16 +6,16 @@
 
     <link href="blueDDL.css" rel="stylesheet" type="text/css" />
 
-    <script src="jquery-1.9.1.js"></script>
-        <script src="blueDDL.js"></script>
-    <script src="jquery-ui-1.10.1.custom.js"></script>
+    <script type="text/javascript" src="jquery-1.9.1.js"></script>
+    <script type="text/javascript" src="blueDDL.js"></script>
+    <script type="text/javascript" src="jquery-ui-1.10.1.custom.js"></script>
 	<script>
         function a(){
             console.log('oi oi oi !');
         }
 		$(document).ready(function() {
             $('#vaiquevai').blueDDL(a);
-            $('#vamoquevamo').blueDDL(a,true);
+            $('#vamoquevamo').blueDDL(a,true,80);
 		});
     </script> 
 
@@ -32,9 +32,9 @@
 	<tr>
     	<td>
               <div id="vaiquevai" style='width:90px'>
-                <div class="listItem">bla1</div>
-                <div class="listItem">bla2</div>
-                <div class="listItem">bla3</div>
+                <div class="listItem" id="1">bla1</div>
+                <div class="listItem" id="2">bla2</div>
+                <div class="listItem" id="3">bla3</div>
               </div>
         </td>
     	<td></td>

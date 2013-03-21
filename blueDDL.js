@@ -65,13 +65,35 @@ var blueDDLClass = (function(){
 	+ '</div>';
 	}
 
+	blueDDLClass.montaData = function(checkBox){
+		var data ={
+			"type": "blueDDL",
+			"isCheckBox": checkBox,
+		};
+
+		data = JSON.stringify(data);
+
+		data = data.replace(/\"/g,'\'');
+
+		return data;
+	}
+
+	blueDDLClass.getData = function(data){
+		var dataStr = data.replace(/\'/g,"\"");
+	    return $.parseJSON(dataStr);
+	}
+
+
 	blueDDLClass.prototype.generatedList = function(nome, list, checkBoxStyle){
 		var listTxt = '';
 		var checkBox='';
 		if(blueDDLClass.checkBox)
 			checkBox ='<div class="myDropDownCheckbox myDropDownUnchecked" />'
+
+		var data = blueDDLClass.montaData(checkBoxStyle);
+
 		$(list).each(function(i,o){
-				listTxt = listTxt + '<div class="myDropDownItem" data="{3}"" id="{0}" >{1} {2}</div>'.format(nome,checkBox,$(o).text(), checkBoxStyle);
+				listTxt = listTxt + '<div class="myDropDownItem" data=\"{2}\" id="{0}" >{1}</div>'.format($(o).attr('id'),$(o).text(), data);
 			});
 		return listTxt;
 	}
@@ -89,14 +111,19 @@ var blueDDLClass = (function(){
 
 	blueDDLClass.myDropDownControler = function() {
 		$('.myDropDownItemContainer', $(this).closest('.myDropDown')).slideToggle("fast");
-		event.stopPropagation()
+
+		//ie fix
+		event.cancelBubble=true;
+		if(event.stopPropagation) event.stopPropagation();
 	};
 
 	blueDDLClass.myDropDownItemControler = function() {
 	    $('.myDropDownBoxName', $(this).closest('.myDropDown')).text($(this).text());
 
+		var data = blueDDLClass.getData($(this).attr('data'));
+
 		//inverte o estado
-		if($(this).attr('data') == 'true'){
+		if(data.isCheckBox == true){
 			if($('.myDropDownCheckbox',this).hasClass('myDropDownChecked')){
 				$('.myDropDownCheckbox',this).removeClass('myDropDownChecked');
 				$('.myDropDownCheckbox',this).addClass('myDropDownUnchecked');
@@ -106,14 +133,42 @@ var blueDDLClass = (function(){
 			}
 		}else{
 			//se não for checkbox já fecha após a seleção
+			$('.selected', $('.myDropDownBoxName', $(this).closest('.myDropDown'))).remove();
+			$(this).addClass('selected');
 			$('.myDropDownItemContainer', $(this).closest('.myDropDown')).slideToggle("fast");
 		}
-		event.stopPropagation();
+
+		//ie fix
+		event.cancelBubble=true;
+		if(event.stopPropagation) event.stopPropagation();
 
 	    return false;
 	};
 
-	function blueDDLClass(clickDelegate, obj, checkBox){
+	blueDDLClass.adicionarNovoItem = function(obj, id, valor){
+		
+		var itemLista = $('.myDropDownItemContainer', obj);
+
+		var data = blueDDLClass.montaData($(obj).attr('data'));
+
+		var novoItem = '<div class="myDropDownItem" data=\"{2}\" id="{0}" >{1}</div>'.format(id,valor,data);
+		
+		$(itemLista).append(novoItem);
+	}
+
+	blueDDLClass.selecionado = function(obj){
+		if ($('.selected',obj).length == 0)
+			return null;
+
+		var data = blueDDLClass.getData($('.selected',obj).attr('data'));
+
+		if(!data.isCheckBox){
+			return $('.selected', $(obj)).attr('id');
+		}
+
+	}
+
+	function blueDDLClass(clickDelegate, obj, checkBox, altura){
 		var nome = $(obj).attr('id');
 		var comprimento = $(obj).width();
     	var textGenerated = this.generateDropdown(nome);
@@ -123,7 +178,7 @@ var blueDDLClass = (function(){
 		//calculando o comprimento
    	    var comprimentoCaixa = comprimento - 17 - 3; //17 é o tamanho do icone e 3 o padding-left
    	    comprimentoCaixa = 'width:'+comprimentoCaixa+'px';
-		comprimento = 'width:'+comprimento+'px';
+		comprimento = 'width:'+comprimento+'px;height:'+altura+'px;';
 
    	    blueDDLClass.checkBox = checkBox;
 
@@ -152,13 +207,19 @@ $('html').click(function() {
  });
 
 $.extend($.fn, {
-    blueDDL: function(itemSelectedClick, checkBox){
+    blueDDL: function(itemSelectedClick, checkBox, altura){
     	if(typeof(checkBox) != "undefined")
-    		new blueDDLClass(itemSelectedClick, this, checkBox);
+    		new blueDDLClass(itemSelectedClick, this, checkBox, altura);
     	else
-    		new blueDDLClass(itemSelectedClick, this, false);
+    		new blueDDLClass(itemSelectedClick, this, false, altura);
 
 		if($('#scriptBlueDDL').length == 0)
 			$('body').append(blueDDLClass.bindEventsDDL);
-    }
+    },
+    blueDDL_Selected: function(){
+    	return blueDDLClass.selecionado(this);
+    },
+    blueDDL_NewItem: function(id, valor){
+    	return blueDDLClass.adicionarNovoItem(this,id,valor);
+    },
 });

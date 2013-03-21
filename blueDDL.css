@@ -12,7 +12,7 @@
 .myDropDownBoxIco { float:left; width:17px; height:17px; background-image:url(imgs/blueDDLImages.png); background-position: 19px -1px; cursor:pointer; }
 
 /*O comprimento é a mesma da caixa, será alterado via Js*/
-.myDropDownItemContainer { position:absolute; z-index:1000; border:solid 1px #00359f; width:1px; }
+.myDropDownItemContainer { position:absolute; z-index:1000; border:solid 1px #00359f; width:1px; overflow-y: auto; }
 
 .myDropDownItem { background-color:#FFFFFF; color:#000000; cursor:pointer; height:15px; border:solid 0px red; padding:2px 0px 0px 3px; }
 .myDropDownItem:hover { background-color:#003366; color:#FFFFFF; }
