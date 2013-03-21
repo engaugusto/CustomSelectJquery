@@ -68,7 +68,7 @@ var blueDDLClass = (function(){
 	blueDDLClass.montaData = function(checkBox){
 		var data ={
 			"type": "blueDDL",
-			"isCheckBox": checkBox,
+			"isCheckBox": checkBox
 		};
 
 		data = JSON.stringify(data);
@@ -84,16 +84,14 @@ var blueDDLClass = (function(){
 	}
 
 
-	blueDDLClass.prototype.generatedList = function(nome, list, checkBoxStyle){
+	blueDDLClass.prototype.generatedList = function(list){
 		var listTxt = '';
 		var checkBox='';
 		if(blueDDLClass.checkBox)
-			checkBox ='<div class="myDropDownCheckbox myDropDownUnchecked" />'
-
-		var data = blueDDLClass.montaData(checkBoxStyle);
+			checkBox ='<div class="myDropDownCheckbox myDropDownUnchecked" > </div>'
 
 		$(list).each(function(i,o){
-				listTxt = listTxt + '<div class="myDropDownItem" data=\"{2}\" id="{0}" >{1}</div>'.format($(o).attr('id'),$(o).text(), data);
+				listTxt = listTxt + '<div class="myDropDownItem" id="{0}" >{1} {2}</div>'.format($(o).attr('id'),$(o).text(),checkBox);
 			});
 		return listTxt;
 	}
@@ -102,8 +100,8 @@ var blueDDLClass = (function(){
 	    return '<div id=\"scriptBlueDDL\"><script type=\"text/javascript\"> \
             $(function(){  \
                $(\'.myDropDown\').each(function(i,o){  \
-               $(\'.myDropDownBox\',o).unbind(\'click\').click(blueDDLClass.myDropDownControler);  \
-               $(\'.myDropDownItem\', o).click(blueDDLClass.myDropDownItemControler);  \
+               	$(\'.myDropDownBox\',o).unbind(\'click\').click(blueDDLClass.myDropDownControler);  \
+               	$(\'.myDropDownItem\', o).click(blueDDLClass.myDropDownItemControler);  \
              });  \
            })  \
            </script></div>'; 
@@ -117,25 +115,35 @@ var blueDDLClass = (function(){
 		if(event.stopPropagation) event.stopPropagation();
 	};
 
-	blueDDLClass.myDropDownItemControler = function() {
-	    $('.myDropDownBoxName', $(this).closest('.myDropDown')).text($(this).text());
+	blueDDLClass.mudaEstadoCheckBox = function(obj){
+	   if($('.myDropDownCheckbox',obj).hasClass('myDropDownChecked')){
+			$('.myDropDownCheckbox',obj).removeClass('myDropDownChecked');
+			$('.myDropDownCheckbox',obj).addClass('myDropDownUnchecked');
+		}else{
+			$('.myDropDownCheckbox',obj).removeClass('myDropDownUnchecked');
+			$('.myDropDownCheckbox',obj).addClass('myDropDownChecked');
+		}
+	}
 
-		var data = blueDDLClass.getData($(this).attr('data'));
+	blueDDLClass.myDropDownItemControler = function(obj) {
+		
+		if(obj instanceof jQuery.Event){
+			obj = this;
+		}
+
+	    $('.myDropDownBoxName', $(obj).closest('.myDropDown')).text($(obj).text());
+
+		//é checkbox ?
+		var isCheckBox = blueDDLClass.getData($(obj).closest('.myDropDown').attr('data')).isCheckBox;
 
 		//inverte o estado
-		if(data.isCheckBox == true){
-			if($('.myDropDownCheckbox',this).hasClass('myDropDownChecked')){
-				$('.myDropDownCheckbox',this).removeClass('myDropDownChecked');
-				$('.myDropDownCheckbox',this).addClass('myDropDownUnchecked');
-			}else{
-				$('.myDropDownCheckbox',this).removeClass('myDropDownUnchecked');
-				$('.myDropDownCheckbox',this).addClass('myDropDownChecked');
-			}
+		if(isCheckBox){
+			blueDDLClass.mudaEstadoCheckBox(obj);
 		}else{
 			//se não for checkbox já fecha após a seleção
-			$('.selected', $('.myDropDownBoxName', $(this).closest('.myDropDown'))).remove();
-			$(this).addClass('selected');
-			$('.myDropDownItemContainer', $(this).closest('.myDropDown')).slideToggle("fast");
+			$('.selected','.myDropDownItemContainer' ,$(obj).closest('.myDropDown')).removeClass('selected')
+			$(obj).addClass('selected');
+			$('.myDropDownItemContainer', $(obj).closest('.myDropDown')).slideToggle("fast");
 		}
 
 		//ie fix
@@ -146,26 +154,62 @@ var blueDDLClass = (function(){
 	};
 
 	blueDDLClass.adicionarNovoItem = function(obj, id, valor){
-		
+		var isCheckBox = blueDDLClass.getData($('.myDropDown',obj).attr('data')).isCheckBox;
+
 		var itemLista = $('.myDropDownItemContainer', obj);
+		var novoItem = '';
 
-		var data = blueDDLClass.montaData($(obj).attr('data'));
+		if(!isCheckBox){
+			novoItem = '<div class="myDropDownItem" onclick="blueDDLClass.myDropDownItemControler(this)" id="{0}" >{1}</div>'.format(id,valor);
+		}else{
+			var checkBox ='<div class="myDropDownCheckbox myDropDownUnchecked" > </div>'
+			novoItem = '<div class="myDropDownItem" onclick="blueDDLClass.myDropDownItemControler(this)" id="{0}" >{1} {2}</div>'.format(id,valor, checkBox);
+		}
 
-		var novoItem = '<div class="myDropDownItem" data=\"{2}\" id="{0}" >{1}</div>'.format(id,valor,data);
-		
 		$(itemLista).append(novoItem);
 	}
 
 	blueDDLClass.selecionado = function(obj){
-		if ($('.selected',obj).length == 0)
+		var isCheckBox = blueDDLClass.getData($('.myDropDown',obj).attr('data')).isCheckBox;
+
+		if ($('.selected',obj).length == 0 && !isCheckBox)
 			return null;
 
-		var data = blueDDLClass.getData($('.selected',obj).attr('data'));
-
-		if(!data.isCheckBox){
-			return $('.selected', $(obj)).attr('id');
+		if(!isCheckBox){
+			return $('.selected', obj).attr('id');
+		}else{
+			var arrayOfId = [];
+			$('.myDropDownChecked', obj).closest('.myDropDownItem').each(function(){
+				 arrayOfId.push($(this).attr('id'));
+				});
+			return arrayOfId;
 		}
+	}
 
+	blueDDLClass.setSelecionado = function(obj, id) {
+		var isCheckBox = blueDDLClass.getData($('.myDropDown',obj).attr('data')).isCheckBox;
+
+		if(!(id instanceof Array)){
+			//limpar os selecionados
+			$('.selected',obj).removeClass('selected')
+			//selecionado o id selecionado
+			var elementToBeSelected = $('div[id="{0}"]'.format(id), $('.myDropDownItemContainer',obj));
+			elementToBeSelected.addClass('selected')
+			//myDropDownBoxName
+			//$('') 
+			$('.myDropDownBoxName', $(elementToBeSelected).closest('.myDropDown')).text($(elementToBeSelected).text())
+			if(isCheckBox){
+				blueDDLClass.mudaEstadoCheckBox(elementToBeSelected);
+			}
+		}else {
+			//limpar os selecionados
+			var arrayOfId = id;
+			$(arrayOfId).each(function(){
+				 var elementToBeSelected = $('div[id="{0}"]'.format(this), $('.myDropDownItemContainer',obj));
+				 elementToBeSelected.addClass('selected')
+				 blueDDLClass.mudaEstadoCheckBox(elementToBeSelected);
+		     });
+		}
 	}
 
 	function blueDDLClass(clickDelegate, obj, checkBox, altura){
@@ -188,11 +232,14 @@ var blueDDLClass = (function(){
 		if(listItem.length <= 0)
 			appendText = textGenerated.format('', comprimentoCaixa,comprimento);
 		else
-			appendText = textGenerated.format(this.generatedList(nome,listItem, checkBox), comprimentoCaixa,comprimento);
+			appendText = textGenerated.format(this.generatedList(listItem), comprimentoCaixa,comprimento);
 
         $(obj).append(
         	appendText
 		);
+
+        //setando o data que diz os comportamentos deste componente
+        $('.myDropDown', obj).attr('data', blueDDLClass.montaData(checkBox));
 
 		if(typeof(clickDelegate) != 'undefined')
 			$('.myDropDownItem', obj).on('click',clickDelegate);
@@ -218,6 +265,9 @@ $.extend($.fn, {
     },
     blueDDL_Selected: function(){
     	return blueDDLClass.selecionado(this);
+    },
+    blueDDL_SetSelected: function(id){
+    	return blueDDLClass.setSelecionado(this,id);
     },
     blueDDL_NewItem: function(id, valor){
     	return blueDDLClass.adicionarNovoItem(this,id,valor);
