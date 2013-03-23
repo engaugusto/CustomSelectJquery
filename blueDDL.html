@@ -10,11 +10,15 @@
     <script type="text/javascript" src="blueDDL.js"></script>
     <script type="text/javascript" src="jquery-ui-1.10.1.custom.js"></script>
 	<script>
+        function b(){
+            console.log('oi2 oi2 oi2 !');
+        }
         function a(){
             console.log('oi oi oi !');
         }
 		$(document).ready(function() {
             $('#vaiquevai').blueDDL(a);
+            $('#vaiquevai').blueDDL_OnClick(b);
             $('#vamoquevamo').blueDDL(a,true,80);
 		});
     </script> 

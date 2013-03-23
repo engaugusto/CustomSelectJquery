@@ -212,7 +212,16 @@ var blueDDLClass = (function(){
 		}
 	}
 
+	blueDDLClass.bindClickEvent = function(obj, clickDelegate){
+		if(typeof(clickDelegate) != 'undefined')
+			$('.myDropDownItem', obj).unbind('click').bind('click',clickDelegate);
+	}
+
 	function blueDDLClass(clickDelegate, obj, checkBox, altura){
+		if($('.myDropDown',obj).length != 0){
+			return;
+		}
+
 		var nome = $(obj).attr('id');
 		var comprimento = $(obj).width();
     	var textGenerated = this.generateDropdown(nome);
@@ -241,8 +250,7 @@ var blueDDLClass = (function(){
         //setando o data que diz os comportamentos deste componente
         $('.myDropDown', obj).attr('data', blueDDLClass.montaData(checkBox));
 
-		if(typeof(clickDelegate) != 'undefined')
-			$('.myDropDownItem', obj).on('click',clickDelegate);
+		blueDDLClass.bindClickEvent(obj, clickDelegate);
 	}
 
 	return blueDDLClass;
@@ -255,6 +263,8 @@ $('html').click(function() {
 
 $.extend($.fn, {
     blueDDL: function(itemSelectedClick, checkBox, altura){
+   		//Verifica se ja esta vinculado e 
+
     	if(typeof(checkBox) != "undefined")
     		new blueDDLClass(itemSelectedClick, this, checkBox, altura);
     	else
@@ -266,8 +276,11 @@ $.extend($.fn, {
     blueDDL_Selected: function(){
     	return blueDDLClass.selecionado(this);
     },
+    blueDDL_OnClick: function(clickEvent){
+    	blueDDLClass.bindClickEvent(this, clickEvent);
+    },
     blueDDL_SetSelected: function(id){
-    	return blueDDLClass.setSelecionado(this,id);
+    	blueDDLClass.setSelecionado(this,id);
     },
     blueDDL_NewItem: function(id, valor){
     	return blueDDLClass.adicionarNovoItem(this,id,valor);
