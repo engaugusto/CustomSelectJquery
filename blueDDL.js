@@ -50,32 +50,44 @@ var blueDDLClass = (function(){
 
 	return '<div id="' + nome + '" class="myDropDown">'
 	+ ''
-	+ '		<div class="myDropDownBox" >'
-	+ '			<div class="myDropDownBoxName" style="{1}">Selecionar</div>'
-	+ '			<div class="myDropDownBoxIco"></div>'
-	+ '			<div style="clear:both;"></div>'
-	+ '		</div>'
+	+ '     <div class="myDropDownBox" >'
+	+ '         <div class="myDropDownBoxName" style="{1}">Selecionar</div>'
+	+ '         <div class="myDropDownBoxIco"></div>'
+	+ '         <div style="clear:both;"></div>'
+	+ '     </div>'
 	+ '	'
-	+ '		<div style="clear:both;"></div>'
+	+ '     <div style="clear:both;"></div>'
 	+ '	'
-	+ '		<div class="myDropDownItemContainer" style="display:none;{2}">'
+	+ '     <div class="myDropDownItemContainer" style="display:none;{2}">'
 	+ '         {0}  '
-	+ '		</div>'
+	+ '     </div>'
 	+ '	'
 	+ '</div>';
 	}
 
-	blueDDLClass.montaData = function(checkBox){
+	blueDDLClass.jsonToStrData = function(data){
+		var dataStr = JSON.stringify(data);
+
+		dataStr = dataStr.replace(/\"/g,'\'');
+
+		return dataStr;
+	}
+
+	blueDDLClass.montaData = function(checkBox, disabled){
+		var disabledField = false;
+
+		if(typeof(disabled) != 'undefined')
+			disabledField = disabled;
+
 		var data ={
 			"type": "blueDDL",
-			"isCheckBox": checkBox
+			"isCheckBox": checkBox,
+			"disabled": disabledField,
 		};
 
-		data = JSON.stringify(data);
+		var dataStr = blueDDLClass.jsonToStrData(data);
 
-		data = data.replace(/\"/g,'\'');
-
-		return data;
+		return dataStr;
 	}
 
 	blueDDLClass.getData = function(data){
@@ -83,6 +95,32 @@ var blueDDLClass = (function(){
 	    return $.parseJSON(dataStr);
 	}
 
+	blueDDLClass.setData = function(obj, data){
+		$(obj).attr('data',blueDDLClass.jsonToStrData(data));
+	}
+
+	blueDDLClass.desabilitarCombo = function(obj){
+		if(!$('.myDropDownBoxName',obj).hasClass('myDropDownDisabled')){
+			$('.myDropDownBoxName',obj).addClass('myDropDownDisabled');
+		}
+		$('.myDropDownItemContainer', obj).slideUp("fast");
+
+		var data = blueDDLClass.getData($('.myDropDown',obj).attr('data'));
+		data.disabled = true;
+
+		blueDDLClass.setData($('.myDropDown',obj), data);
+	}
+
+	blueDDLClass.habilitarCombo = function(obj){
+		if($('.myDropDownBoxName',obj).hasClass('myDropDownDisabled')){
+			$('.myDropDownBoxName',obj).removeClass('myDropDownDisabled');
+		}
+
+		var data = blueDDLClass.getData($('.myDropDown',obj).attr('data'));
+		data.disabled = false;
+
+		blueDDLClass.setData($('.myDropDown',obj), data);
+	}
 
 	blueDDLClass.prototype.generatedList = function(list){
 		var listTxt = '';
@@ -108,6 +146,10 @@ var blueDDLClass = (function(){
 	};
 
 	blueDDLClass.myDropDownControler = function() {
+		//Verifica se esta desabilitado
+		if($('.myDropDownBoxName',this).hasClass('myDropDownDisabled'))
+			return;
+
 		$('.myDropDownItemContainer', $(this).closest('.myDropDown')).slideToggle("fast");
 
 		//ie fix
@@ -273,14 +315,24 @@ $.extend($.fn, {
 		if($('#scriptBlueDDL').length == 0)
 			$('body').append(blueDDLClass.bindEventsDDL);
     },
+	blueDDL_SetSelected: function(id){
+    	blueDDLClass.setSelecionado(this,id);
+    },   
     blueDDL_Selected: function(){
     	return blueDDLClass.selecionado(this);
     },
     blueDDL_OnClick: function(clickEvent){
     	blueDDLClass.bindClickEvent(this, clickEvent);
     },
-    blueDDL_SetSelected: function(id){
-    	blueDDLClass.setSelecionado(this,id);
+    blueDDL_Disable: function(disableArg){
+    	var disable = true;
+    	if(typeof(disableArg) != 'undefined')
+    		disable = disableArg;
+    	if(disable){
+    		blueDDLClass.desabilitarCombo(this);
+    	}else{
+			blueDDLClass.habilitarCombo(this);
+    	}
     },
     blueDDL_NewItem: function(id, valor){
     	return blueDDLClass.adicionarNovoItem(this,id,valor);
