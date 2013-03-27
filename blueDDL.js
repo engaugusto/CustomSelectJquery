@@ -134,15 +134,11 @@ var blueDDLClass = (function(){
 		return listTxt;
 	}
 
-	blueDDLClass.bindEventsDDL = function(){
-	    return '<div id=\"scriptBlueDDL\"><script type=\"text/javascript\"> \
-            $(function(){  \
-               $(\'.myDropDown\').each(function(i,o){  \
-               	$(\'.myDropDownBox\',o).unbind(\'click\').click(blueDDLClass.myDropDownControler);  \
-               	$(\'.myDropDownItem\', o).click(blueDDLClass.myDropDownItemControler);  \
-             });  \
-           })  \
-           </script></div>'; 
+	blueDDLClass.bindEventsDDL = function(objHtml){
+	    $('.myDropDown',objHtml).each(function(i,o){  
+           	$('.myDropDownBox',o).unbind('click').click(blueDDLClass.myDropDownControler);  
+           	$('.myDropDownItem', o).unbind('click').click(blueDDLClass.myDropDownItemControler);  
+        });
 	};
 
 	blueDDLClass.myDropDownControler = function() {
@@ -153,8 +149,10 @@ var blueDDLClass = (function(){
 		$('.myDropDownItemContainer', $(this).closest('.myDropDown')).slideToggle("fast");
 
 		//ie fix
-		event.cancelBubble=true;
-		if(event.stopPropagation) event.stopPropagation();
+		if(typeof(event) != 'undefined'){
+			event.cancelBubble=true;
+			if(event.stopPropagation) event.stopPropagation();
+		}
 	};
 
 	blueDDLClass.mudaEstadoCheckBox = function(obj){
@@ -189,9 +187,10 @@ var blueDDLClass = (function(){
 		}
 
 		//ie fix
-		event.cancelBubble=true;
-		if(event.stopPropagation) event.stopPropagation();
-
+		if(typeof(event) != 'undefined'){
+			event.cancelBubble=true;
+			if(event.stopPropagation) event.stopPropagation();
+		}
 	    return false;
 	};
 
@@ -237,8 +236,7 @@ var blueDDLClass = (function(){
 			//selecionado o id selecionado
 			var elementToBeSelected = $('div[id="{0}"]'.format(id), $('.myDropDownItemContainer',obj));
 			elementToBeSelected.addClass('selected')
-			//myDropDownBoxName
-			//$('') 
+			
 			$('.myDropDownBoxName', $(elementToBeSelected).closest('.myDropDown')).text($(elementToBeSelected).text())
 			if(isCheckBox){
 				blueDDLClass.mudaEstadoCheckBox(elementToBeSelected);
@@ -254,9 +252,9 @@ var blueDDLClass = (function(){
 		}
 	}
 
-	blueDDLClass.bindClickEvent = function(obj, clickDelegate){
+	blueDDLClass.bindClickEvent = function(obj, clickDelegate) {
 		if(typeof(clickDelegate) != 'undefined')
-			$('.myDropDownItem', obj).unbind('click').bind('click',clickDelegate);
+			$('.myDropDownItem', obj).bind('click',clickDelegate);
 	}
 
 	function blueDDLClass(clickDelegate, obj, checkBox, altura){
@@ -291,8 +289,6 @@ var blueDDLClass = (function(){
 
         //setando o data que diz os comportamentos deste componente
         $('.myDropDown', obj).attr('data', blueDDLClass.montaData(checkBox));
-
-		blueDDLClass.bindClickEvent(obj, clickDelegate);
 	}
 
 	return blueDDLClass;
@@ -312,9 +308,13 @@ $.extend($.fn, {
     	else
     		new blueDDLClass(itemSelectedClick, this, false, altura);
 
-		if($('#scriptBlueDDL').length == 0)
-			$('body').append(blueDDLClass.bindEventsDDL);
-    },
+    	var objHtml = $(this)
+
+		blueDDLClass.bindEventsDDL(objHtml);
+
+		//vinculando depois o evento click
+		blueDDLClass.bindClickEvent(this, itemSelectedClick);
+	},
 	blueDDL_SetSelected: function(id){
     	blueDDLClass.setSelecionado(this,id);
     },   
