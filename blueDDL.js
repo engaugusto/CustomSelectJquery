@@ -73,16 +73,27 @@ var blueDDLClass = (function(){
 		return dataStr;
 	}
 
-	blueDDLClass.montaData = function(checkBox, disabled){
+	blueDDLClass.montaData = function(checkBox, disabled, invertedDropDown, altura){
 		var disabledField = false;
-
+		var invertedDropDownField = false;
+		var alturaField = null;
+		
 		if(typeof(disabled) != 'undefined')
 			disabledField = disabled;
+		
+		if(typeof(invertedDropDown) != 'undefined')
+			invertedDropDownField = invertedDropDown;
+		
+		if(typeof(altura) != 'undefined' && altura != null){
+			alturaField = altura;
+		}
 
 		var data ={
 			"type": "blueDDL",
 			"isCheckBox": checkBox,
+			"invertedDropDown": invertedDropDownField,
 			"disabled": disabledField,
+			"altura": alturaField
 		};
 
 		var dataStr = blueDDLClass.jsonToStrData(data);
@@ -145,17 +156,18 @@ var blueDDLClass = (function(){
 		//Verifica se esta desabilitado
 		if($('.myDropDownBoxName',this).hasClass('myDropDownDisabled'))
 			return;
-
-		$('.myDropDownItemContainer', $(this).closest('.myDropDown')).slideToggle("fast");
+		
+		
+		var data = blueDDLClass.getData($(this).closest('.myDropDown').attr('data'));
+		
+		//Colen		
+		if(data.invertedDropDown)		
+			$('.myDropDownItemContainer', $(this).closest('.myDropDown')).animate({ marginTop: "-"+data.altura+"px" }, 5000 );
+		else
+			$('.myDropDownItemContainer', $(this).closest('.myDropDown')).slideToggle("fast");
 		
 		$('.myDropDownItemContainer').removeClass('opened');
 		$('.myDropDownItemContainer', $(this).closest('.myDropDown')).addClass('opened');
-		
-		//ie fix
-		/*if(typeof(event) != 'undefined'){
-			event.cancelBubble=true;
-			if(event.stopPropagation) event.stopPropagation();
-		}*/
 	};
 
 	blueDDLClass.mudaEstadoCheckBox = function(obj){
@@ -260,9 +272,12 @@ var blueDDLClass = (function(){
 			$('.myDropDownItem', obj).bind('click',clickDelegate);
 	}
 
-	function blueDDLClass(clickDelegate, obj, checkBox, altura){
+	function blueDDLClass(clickDelegate, obj, checkBox, altura, invertedDropDown){
 		if($('.myDropDown',obj).length != 0){
 			return;
+		}
+		if(typeof(altura) == 'undefined'){
+			altura = 50;
 		}
 
 		var nome = $(obj).attr('id');
@@ -291,7 +306,7 @@ var blueDDLClass = (function(){
 		);
 
         //setando o data que diz os comportamentos deste componente
-        $('.myDropDown', obj).attr('data', blueDDLClass.montaData(checkBox));
+        $('.myDropDown', obj).attr('data', blueDDLClass.montaData(checkBox, false, invertedDropDown, altura));
 	}
 
 	return blueDDLClass;
@@ -307,13 +322,13 @@ $('html').click(function(e) {
  });
 
 $.extend($.fn, {
-    blueDDL: function(itemSelectedClick, checkBox, altura){
+    blueDDL: function(itemSelectedClick, checkBox, altura, invertedDropDown){
    		//Verifica se ja esta vinculado e 
 
     	if(typeof(checkBox) != "undefined")
-    		new blueDDLClass(itemSelectedClick, this, checkBox, altura);
+    		new blueDDLClass(itemSelectedClick, this, checkBox, altura, invertedDropDown);
     	else
-    		new blueDDLClass(itemSelectedClick, this, false, altura);
+    		new blueDDLClass(itemSelectedClick, this, false, altura, invertedDropDown);
 
     	var objHtml = $(this)
 
