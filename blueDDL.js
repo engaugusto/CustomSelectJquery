@@ -147,12 +147,15 @@ var blueDDLClass = (function(){
 			return;
 
 		$('.myDropDownItemContainer', $(this).closest('.myDropDown')).slideToggle("fast");
-
+		
+		$('.myDropDownItemContainer').removeClass('opened');
+		$('.myDropDownItemContainer', $(this).closest('.myDropDown')).addClass('opened');
+		
 		//ie fix
-		if(typeof(event) != 'undefined'){
+		/*if(typeof(event) != 'undefined'){
 			event.cancelBubble=true;
 			if(event.stopPropagation) event.stopPropagation();
-		}
+		}*/
 	};
 
 	blueDDLClass.mudaEstadoCheckBox = function(obj){
@@ -181,7 +184,7 @@ var blueDDLClass = (function(){
 			blueDDLClass.mudaEstadoCheckBox(obj);
 		}else{
 			//se não for checkbox já fecha após a seleção
-			$('.selected','.myDropDownItemContainer' ,$(obj).closest('.myDropDown')).removeClass('selected')
+			$('.selected',$('.myDropDownItemContainer' ,$(obj).closest('.myDropDown'))).removeClass('selected')
 			$(obj).addClass('selected');
 			$('.myDropDownItemContainer', $(obj).closest('.myDropDown')).slideToggle("fast");
 		}
@@ -295,8 +298,12 @@ var blueDDLClass = (function(){
 
 })();
 
-$('html').click(function() {
-  $('.myDropDownItemContainer').slideUp("fast");
+$('html').click(function(e) {
+  if($(e.target).closest('.myDropDown')[0] != null){
+     $('.myDropDownItemContainer:not(.opened)').slideUp("fast");
+  }else{
+	$('.myDropDownItemContainer').slideUp("fast");
+  }
  });
 
 $.extend($.fn, {
